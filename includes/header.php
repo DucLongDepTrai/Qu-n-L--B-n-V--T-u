@@ -51,8 +51,14 @@
                         </li>
                     </ul>
                 </li>
+            <?php elseif (isset($_SESSION['khach_hang'])): ?>
+                <li><a href="<?php echo BASE_URL ?>modules/dat-ve/">Đặt vé</a></li>
+                <li><a href="<?php echo BASE_URL ?>modules/dat-ve/ve-cua-toi.php">Vé của tôi</a></li>
+                <li><a href="<?php echo BASE_URL ?>modules/auth/dang_xuat_khach.php">Đăng xuất</a></li>
             <?php else: ?>
-                <li><a href="<?php echo BASE_URL ?>modules/auth/dang_nhap.php">Đăng nhập</a></li>
+                <li><a href="<?php echo BASE_URL ?>modules/auth/dang_nhap_khach.php">Đăng nhập khách</a></li>
+                <li><a href="<?php echo BASE_URL ?>modules/auth/dang_ky.php">Đăng ký</a></li>
+                <li><a href="<?php echo BASE_URL ?>modules/auth/dang_nhap.php">Nhân viên</a></li>
             <?php endif; ?>
         </ul>
     </header>

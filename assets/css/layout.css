@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
+    background: #f3f7f6;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -249,4 +249,108 @@ header {
         padding: 8px 10px;
         font-size: 13px;
     }
+}
+
+.container {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.container > .main-content {
+    margin: 32px 0;
+}
+
+/* Public booking and customer forms */
+.booking {
+    width: min(1120px, calc(100% - 32px));
+    margin: 34px auto 48px;
+}
+
+.booking > div:first-child {
+    padding: 0 4px 22px;
+    border-bottom: 1px solid #dce8e4;
+    margin-bottom: 24px;
+}
+
+.booking h1,
+.booking h2,
+.auth-card h1 {
+    margin: 0;
+    color: #173f3a;
+}
+
+.booking h1 { font-size: 32px; }
+.booking h2 { font-size: 21px; margin-bottom: 18px; }
+
+.booking .panel {
+    padding: 28px;
+    border: 1px solid #e1ebe8;
+    margin-bottom: 24px;
+}
+
+.booking .panel > p {
+    margin: 0 0 18px;
+    color: #60716e;
+}
+
+.booking .schedule-list { gap: 14px; }
+
+.booking .schedule {
+    padding: 18px 20px;
+    background: #fbfdfc;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+
+.booking .schedule:hover {
+    border-color: #1f7a65;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(31, 122, 101, .1);
+}
+
+.booking .button { margin-top: 4px; }
+
+.booking .seats {
+    gap: 14px;
+    margin: 20px 0 8px;
+}
+
+.booking .seat {
+    min-height: 78px;
+    display: grid;
+    place-content: center;
+    line-height: 1.45;
+}
+
+.booking .seat small { margin-top: 3px; }
+
+.auth-card {
+    width: min(760px, calc(100% - 32px));
+    margin: 48px auto;
+}
+
+.auth-card h1 { margin-bottom: 24px; }
+
+.auth-card form { margin-top: 8px; }
+
+.auth-card p { margin: 22px 0 0; color: #60716e; }
+
+@media (max-width: 640px) {
+    .booking { width: min(100% - 24px, 560px); margin-top: 24px; }
+    .booking h1 { font-size: 27px; }
+    .booking .panel { padding: 20px 16px; }
+    .booking .schedule { padding: 16px; }
+    .booking .button { width: 100%; text-align: center; }
+    .auth-card { width: min(100% - 24px, 560px); margin: 24px auto; padding: 24px !important; }
+}
+
+.booking .coach-list { display: grid; gap: 22px; margin: 20px 0 8px; }
+.booking .coach { overflow: hidden; border: 1px solid #d9e8e3; border-radius: 10px; background: #fbfdfc; }
+.booking .coach-header { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 16px; background: #eaf4f0; border-bottom: 1px solid #d9e8e3; }
+.booking .coach-name { color: #173f3a; font-weight: 700; }
+.booking .coach-type { color: #55716a; font-size: 14px; }
+.booking .coach-seats { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 12px; padding: 16px; }
+
+@media (max-width: 640px) {
+    .booking .coach-header { align-items: flex-start; flex-direction: column; gap: 4px; }
+    .booking .coach-seats { grid-template-columns: repeat(2, 1fr); padding: 12px; }
 }

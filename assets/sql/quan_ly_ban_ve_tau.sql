@@ -3,11 +3,10 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 30, 2026 lúc 07:06 AM
+-- Thời gian đã tạo: Th9 12, 2026 lúc 06:45 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.0.30
 
-SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -21,14 +20,11 @@ SET time_zone = "+00:00";
 --
 -- Cơ sở dữ liệu: `quan_ly_ban_ve_tau`
 --
-CREATE DATABASE IF NOT EXISTS `quan_ly_ban_ve_tau` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `quan_ly_ban_ve_tau`;
 
 DELIMITER $$
 --
 -- Thủ tục
 --
-DROP PROCEDURE IF EXISTS `sp_DoanhThuBayNgay`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_DoanhThuBayNgay` ()   BEGIN
 SELECT
     DATE (ngay_dat) AS ngay, COALESCE (SUM(gia_ve), 0) AS doanh_thu
@@ -38,7 +34,6 @@ GROUP BY DATE (ngay_dat)
 ORDER BY ngay ASC;
 END$$
 
-DROP PROCEDURE IF EXISTS `sp_ThongKeDoanhSo`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ThongKeDoanhSo` (IN `p_thang` INT, IN `p_nam` INT)   BEGIN
 SELECT nv.ma_nhan_vien,
        nv.ho_ten,
@@ -54,19 +49,17 @@ GROUP BY nv.id
 ORDER BY doanh_so DESC;
 END$$
 
-DROP PROCEDURE IF EXISTS `sp_ThongKeDoanhThuTheoNgay`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ThongKeDoanhThuTheoNgay` (IN `p_ngay_bat_dau` DATE, IN `p_ngay_ket_thuc` DATE)   BEGIN
 SELECT
     DATE (ngay_dat) as ngay, COALESCE (SUM(gia_ve), 0) as doanh_thu, COUNT(id) as so_ve_ban
 FROM ve_tau
-WHERE DATE (ngay_dat) BETWEEN '2025-01-01'
-  AND '2025-12-31'
+WHERE DATE (ngay_dat) BETWEEN '2026-01-01'
+  AND '2026-12-31'
   AND trang_thai = 'Đã thanh toán'
 GROUP BY DATE (ngay_dat)
 ORDER BY ngay ASC;
 END$$
 
-DROP PROCEDURE IF EXISTS `sp_ThongKeDoanhThuTheoTuyen`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ThongKeDoanhThuTheoTuyen` (IN `p_ngay_bat_dau` DATE, IN `p_ngay_ket_thuc` DATE)   BEGIN
 SELECT td.ten_tuyen,
        COALESCE(SUM(vt.gia_ve), 0) as doanh_thu
@@ -80,7 +73,6 @@ GROUP BY td.ten_tuyen
 ORDER BY doanh_thu DESC;
 END$$
 
-DROP PROCEDURE IF EXISTS `sp_ThongKeKhachHangVIP`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ThongKeKhachHangVIP` (IN `p_limit` INT)   BEGIN
 SELECT kh.ho_ten,
        kh.sdt,
@@ -93,7 +85,6 @@ GROUP BY kh.id
 ORDER BY tong_tien_chi_tieu DESC LIMIT p_limit;
 END$$
 
-DROP PROCEDURE IF EXISTS `sp_ThongKeTyLeLapDay`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ThongKeTyLeLapDay` (IN `p_ngay_bat_dau` DATE, IN `p_ngay_ket_thuc` DATE)   BEGIN
 SELECT lt.ma_lich_trinh,
        t.ten_tau,
@@ -126,17 +117,13 @@ DELIMITER ;
 -- Cấu trúc bảng cho bảng `ga_tau`
 --
 
-DROP TABLE IF EXISTS `ga_tau`;
-CREATE TABLE IF NOT EXISTS `ga_tau` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ga_tau` (
+  `id` int(11) NOT NULL,
   `ma_ga` varchar(20) NOT NULL COMMENT 'VD: HN, DN, SG',
   `ten_ga` varchar(100) NOT NULL COMMENT 'VD: Ga Hà Nội',
   `dia_chi` varchar(255) DEFAULT NULL,
-  `thanh_pho` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ma_ga` (`ma_ga`),
-  UNIQUE KEY `ten_ga` (`ten_ga`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `thanh_pho` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `ga_tau`
@@ -160,15 +147,11 @@ INSERT INTO `ga_tau` (`id`, `ma_ga`, `ten_ga`, `dia_chi`, `thanh_pho`) VALUES
 -- Cấu trúc bảng cho bảng `ghe`
 --
 
-DROP TABLE IF EXISTS `ghe`;
-CREATE TABLE IF NOT EXISTS `ghe` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ghe` (
+  `id` int(11) NOT NULL,
   `so_ghe` varchar(10) NOT NULL COMMENT 'VD: A1, B2',
-  `id_toa_tau` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_ghe_trong_toa` (`so_ghe`,`id_toa_tau`),
-  KEY `id_toa_tau` (`id_toa_tau`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id_toa_tau` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `ghe`
@@ -230,19 +213,15 @@ INSERT INTO `ghe` (`id`, `so_ghe`, `id_toa_tau`) VALUES
 -- Cấu trúc bảng cho bảng `khach_hang`
 --
 
-DROP TABLE IF EXISTS `khach_hang`;
-CREATE TABLE IF NOT EXISTS `khach_hang` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `khach_hang` (
+  `id` int(11) NOT NULL,
   `cccd` varchar(20) DEFAULT NULL,
   `ho_ten` varchar(100) NOT NULL,
   `ngay_sinh` date NOT NULL DEFAULT curdate(),
   `gioi_tinh` varchar(20) NOT NULL,
   `sdt` varchar(20) NOT NULL,
-  `dia_chi` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sdt` (`sdt`),
-  UNIQUE KEY `cccd` (`cccd`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `dia_chi` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `khach_hang`
@@ -268,7 +247,8 @@ INSERT INTO `khach_hang` (`id`, `cccd`, `ho_ten`, `ngay_sinh`, `gioi_tinh`, `sdt
 (17, '001090000017', 'Lưu Thị Mơ', '1995-11-11', 'Nữ', '0915333444', 'Quận 1, TP.HCM'),
 (18, '001090000018', 'Trương Tấn Tài', '1990-09-09', 'Nam', '0915555666', 'Biên Hòa, Đồng Nai'),
 (19, '001090000019', 'Đinh Ngọc Diệp', '2001-07-20', 'Nữ', '0915777888', 'Thanh Xuân, Hà Nội'),
-(20, '001090000020', 'Tạ Văn Quang', '1983-05-05', 'Nam', '0915999000', 'Sơn Trà, Đà Nẵng');
+(20, '001090000020', 'Tạ Văn Quang', '1983-05-05', 'Nam', '0915999000', 'Sơn Trà, Đà Nẵng'),
+(21, '0010900001234', 'Hoàng Anh', '2006-01-12', 'Nam', '0924861859', 'Vĩnh Phúc');
 
 -- --------------------------------------------------------
 
@@ -276,39 +256,34 @@ INSERT INTO `khach_hang` (`id`, `cccd`, `ho_ten`, `ngay_sinh`, `gioi_tinh`, `sdt
 -- Cấu trúc bảng cho bảng `lich_trinh`
 --
 
-DROP TABLE IF EXISTS `lich_trinh`;
-CREATE TABLE IF NOT EXISTS `lich_trinh` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `lich_trinh` (
+  `id` int(11) NOT NULL,
   `ma_lich_trinh` varchar(20) DEFAULT NULL,
   `id_tau` int(11) NOT NULL,
   `id_tuyen_duong` int(11) NOT NULL,
   `ngay_di` datetime NOT NULL,
   `ngay_den` datetime NOT NULL,
-  `trang_thai` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_tau_schedule` (`id_tau`,`ngay_di`),
-  UNIQUE KEY `ma_lich_trinh` (`ma_lich_trinh`),
-  KEY `id_tuyen_duong` (`id_tuyen_duong`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `trang_thai` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `lich_trinh`
 --
 
 INSERT INTO `lich_trinh` (`id`, `ma_lich_trinh`, `id_tau`, `id_tuyen_duong`, `ngay_di`, `ngay_den`, `trang_thai`) VALUES
-(1, 'LT-TET-01', 1, 1, '2025-01-20 06:00:00', '2025-01-21 12:00:00', 'Hoàn thành'),
-(2, 'LT-TET-02', 2, 2, '2025-01-21 08:00:00', '2025-01-22 14:00:00', 'Hoàn thành'),
-(3, 'LT-TET-03', 1, 3, '2025-01-25 10:00:00', '2025-01-25 22:00:00', 'Hoàn thành'),
-(4, 'LT-MAR-01', 3, 6, '2025-03-10 07:00:00', '2025-03-10 14:00:00', 'Hoàn thành'),
-(5, 'LT-APR-01', 5, 5, '2025-04-29 20:00:00', '2025-04-30 05:00:00', 'Hoàn thành'),
-(6, 'LT-APR-02', 6, 6, '2025-04-30 06:00:00', '2025-04-30 12:00:00', 'Hoàn thành'),
-(7, 'LT-MAY-01', 1, 1, '2025-05-01 06:00:00', '2025-05-02 12:00:00', 'Hoàn thành'),
-(8, 'LT-JUN-01', 2, 8, '2025-06-15 08:00:00', '2025-06-15 20:00:00', 'Hoàn thành'),
-(9, 'LT-JUN-02', 2, 8, '2025-06-20 08:00:00', '2025-06-20 20:00:00', 'Chờ'),
-(10, 'LT-DEC-01', 1, 1, '2025-12-25 06:00:00', '2025-12-26 12:00:00', 'Chờ'),
-(11, 'LT-JUN-05', 5, 3, '2025-06-25 06:00:00', '2025-06-25 18:00:00', 'Hoàn thành'),
-(12, 'LT-JUL-01', 6, 5, '2025-07-01 20:00:00', '2025-07-02 05:00:00', 'Hoàn thành'),
-(13, 'LT-JUL-05', 2, 8, '2025-07-05 08:00:00', '2025-07-05 20:00:00', 'Hoàn thành');
+(1, 'LT-TET-01', 1, 1, '2026-01-20 06:00:00', '2026-01-21 12:00:00', 'Hoàn thành'),
+(2, 'LT-TET-02', 2, 2, '2026-01-21 08:00:00', '2026-01-22 14:00:00', 'Hoàn thành'),
+(3, 'LT-TET-03', 1, 3, '2026-01-25 10:00:00', '2026-01-25 22:00:00', 'Hoàn thành'),
+(4, 'LT-MAR-01', 3, 6, '2026-03-10 07:00:00', '2026-03-10 14:00:00', 'Hoàn thành'),
+(5, 'LT-APR-01', 5, 5, '2026-04-29 20:00:00', '2026-04-30 05:00:00', 'Hoàn thành'),
+(6, 'LT-APR-02', 6, 6, '2026-04-30 06:00:00', '2026-04-30 12:00:00', 'Hoàn thành'),
+(7, 'LT-MAY-01', 1, 1, '2026-05-01 06:00:00', '2026-05-02 12:00:00', 'Hoàn thành'),
+(8, 'LT-JUN-01', 2, 8, '2026-06-15 08:00:00', '2026-06-15 20:00:00', 'Hoàn thành'),
+(9, 'LT-JUN-02', 2, 8, '2026-06-20 08:00:00', '2026-06-20 20:00:00', 'Chờ'),
+(10, 'LT-DEC-01', 1, 1, '2026-12-25 06:00:00', '2026-12-26 12:00:00', 'Chưa chạy'),
+(11, 'LT-JUN-05', 5, 3, '2026-06-25 06:00:00', '2026-06-25 18:00:00', 'Hoàn thành'),
+(12, 'LT-JUL-01', 6, 5, '2026-07-01 20:00:00', '2026-07-02 05:00:00', 'Hoàn thành'),
+(13, 'LT-JUL-05', 2, 8, '2026-10-12 08:00:00', '2026-11-12 20:00:00', 'Chưa chạy');
 
 -- --------------------------------------------------------
 
@@ -316,14 +291,11 @@ INSERT INTO `lich_trinh` (`id`, `ma_lich_trinh`, `id_tau`, `id_tuyen_duong`, `ng
 -- Cấu trúc bảng cho bảng `loai_toa`
 --
 
-DROP TABLE IF EXISTS `loai_toa`;
-CREATE TABLE IF NOT EXISTS `loai_toa` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `loai_toa` (
+  `id` int(11) NOT NULL,
   `ten_loai` varchar(50) NOT NULL COMMENT 'VD: Ngồi mềm điều hòa, Giường nằm',
-  `he_so_gia` decimal(3,2) DEFAULT 1.00,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ten_loai` (`ten_loai`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `he_so_gia` decimal(3,2) DEFAULT 1.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `loai_toa`
@@ -341,9 +313,8 @@ INSERT INTO `loai_toa` (`id`, `ten_loai`, `he_so_gia`) VALUES
 -- Cấu trúc bảng cho bảng `nhan_vien`
 --
 
-DROP TABLE IF EXISTS `nhan_vien`;
-CREATE TABLE IF NOT EXISTS `nhan_vien` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `nhan_vien` (
+  `id` int(11) NOT NULL,
   `ma_nhan_vien` varchar(20) NOT NULL,
   `mat_khau` varchar(255) NOT NULL,
   `ho_ten` varchar(100) NOT NULL,
@@ -352,23 +323,15 @@ CREATE TABLE IF NOT EXISTS `nhan_vien` (
   `sdt` varchar(20) NOT NULL,
   `email` varchar(100) DEFAULT NULL,
   `dia_chi` varchar(255) NOT NULL,
-  `vai_tro` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ma_nhan_vien` (`ma_nhan_vien`),
-  UNIQUE KEY `sdt` (`sdt`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `vai_tro` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `nhan_vien`
 --
 
 INSERT INTO `nhan_vien` (`id`, `ma_nhan_vien`, `mat_khau`, `ho_ten`, `ngay_sinh`, `gioi_tinh`, `sdt`, `email`, `dia_chi`, `vai_tro`) VALUES
-(1, 'ADMIN01', '$2a$12$gmkjs/CePmv8B6L684vWD.ytns6H4aoo4EXuFcVMAfWD1iV586QzW', 'Nguyễn Quốc Hưng', '1980-05-15', 'Nam', '0909123456', 'hung.nguyen@tauhoa.vn', 'Số 10, Đội Cấn, Ba Đình, Hà Nội', 'Quản trị viên'),
-(2, 'ADMIN02', '$2a$12$JriS6Fh3iYVWC2APBzOmju8X9/6V/z6TTjWSi9w2QS3h0f037.wL6', 'Trần Thị Thanh Tâm', '1985-08-20', 'Nữ', '0909234567', 'tam.tran@tauhoa.vn', '15 Lê Lợi, Hải Châu, Đà Nẵng', 'Quản trị viên'),
-(3, 'ADMIN03', '$2a$12$2nMQzv/tJzBU804t5tJ3MOj.EWhAGynFs7vuDT5KNgNENxz1yWMXu', 'Lê Văn Tuân', '1990-12-10', 'Nam', '0909345678', 'tuan.le@tauhoa.vn', '120 Nguyễn Thị Minh Khai, Q3, TP.HCM', 'Quản trị viên'),
-(4, 'ADMIN04', '$2a$12$bEKMSlItzcpnDzDyqxx5G.uvj4vxAQnpwE2i.mQAAccOPA2iZ6k7a', 'Phạm Minh Hoàng', '1982-03-25', 'Nam', '0909456789', 'hoang.pham@tauhoa.vn', 'TP. Thủ Đức, TP.HCM', 'Quản trị viên'),
-(5, 'ADMIN05', '$2a$12$n3oI8f3gurpnlkS1KhAZcu98h7If0B0m7NRAPVDHo10BvIGrj5qHa', 'Hoàng Thu Thảo', '1995-06-30', 'Nữ', '0909567890', 'thao.hoang@tauhoa.vn', 'Cầu Giấy, Hà Nội', 'Quản trị viên'),
+(1, 'ADMIN01', '$2a$12$gmkjs/CePmv8B6L684vWD.ytns6H4aoo4EXuFcVMAfWD1iV586QzW', 'Trung', '1980-05-15', 'Nam', '0909123456', 'Trung@tauhoa.vn', 'Số 10, Đội Cấn, Ba Đình, Hà Nội', 'Quản trị viên'),
 (6, 'NV01', '$2a$12$WS1mox8/ujPzoAsNGQ8S5OfsBt1FqG6TrqMQABvnx2vIiYEbcoto6', 'Vũ Thị Thu Ngân', '1998-04-26', 'Nữ', '0909678901', 'ngan.vu@tauhoa.vn', 'Thanh Khê, Đà Nẵng', 'Nhân viên'),
 (7, 'NV02', '$2a$12$RQ1t6qizqBDzPokkJxpfLucu2i6M0SEjcP5UNiNlonXRWG1geAaNy', 'Ngô Xuân Bách', '1993-09-15', 'Nam', '0909789012', 'bach.ngo@tauhoa.vn', 'Gò Vấp, TP.HCM', 'Nhân viên'),
 (8, 'NV03', '$2a$12$u1h7j1s6ATb8Du0STcvZk.8VuA7KSMqeQzUWbnR2NdR34Jz.kKqhO', 'Đặng Tuyết Mai', '2000-01-20', 'Nữ', '0909890123', 'mai.dang@tauhoa.vn', 'Long Biên, Hà Nội', 'Nhân viên'),
@@ -377,17 +340,35 @@ INSERT INTO `nhan_vien` (`id`, `ma_nhan_vien`, `mat_khau`, `ho_ten`, `ngay_sinh`
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `tai_khoan_khach_hang`
+--
+
+CREATE TABLE `tai_khoan_khach_hang` (
+  `id` int(11) NOT NULL,
+  `id_khach_hang` int(11) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `mat_khau` varchar(255) NOT NULL,
+  `ngay_tao` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `tai_khoan_khach_hang`
+--
+
+INSERT INTO `tai_khoan_khach_hang` (`id`, `id_khach_hang`, `email`, `mat_khau`, `ngay_tao`) VALUES
+(1, 21, 'hoanganh@gmail.com', '$2y$10$y0./JPOCVj/qiSPATPrvgOQjp3O8NrATQRRLISyEie3BKlCC.VGmq', '2026-09-12 23:07:12');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `tau`
 --
 
-DROP TABLE IF EXISTS `tau`;
-CREATE TABLE IF NOT EXISTS `tau` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `tau` (
+  `id` int(11) NOT NULL,
   `ma_tau` varchar(20) NOT NULL COMMENT 'VD: SE1, TN1',
-  `ten_tau` varchar(100) NOT NULL COMMENT 'VD: Tàu Thống Nhất SE1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ma_tau` (`ma_tau`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `ten_tau` varchar(100) NOT NULL COMMENT 'VD: Tàu Thống Nhất SE1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `tau`
@@ -410,17 +391,12 @@ INSERT INTO `tau` (`id`, `ma_tau`, `ten_tau`) VALUES
 -- Cấu trúc bảng cho bảng `toa_tau`
 --
 
-DROP TABLE IF EXISTS `toa_tau`;
-CREATE TABLE IF NOT EXISTS `toa_tau` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `toa_tau` (
+  `id` int(11) NOT NULL,
   `ma_toa` varchar(20) NOT NULL COMMENT 'VD: Toa 1, Toa 2',
   `id_tau` int(11) NOT NULL,
-  `id_loai_toa` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_toa_trong_tau` (`ma_toa`,`id_tau`),
-  KEY `id_tau` (`id_tau`),
-  KEY `id_loai_toa` (`id_loai_toa`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id_loai_toa` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `toa_tau`
@@ -446,20 +422,15 @@ INSERT INTO `toa_tau` (`id`, `ma_toa`, `id_tau`, `id_loai_toa`) VALUES
 -- Cấu trúc bảng cho bảng `tuyen_duong`
 --
 
-DROP TABLE IF EXISTS `tuyen_duong`;
-CREATE TABLE IF NOT EXISTS `tuyen_duong` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `tuyen_duong` (
+  `id` int(11) NOT NULL,
   `ma_tuyen` varchar(20) NOT NULL COMMENT 'VD: HN-SG',
   `ten_tuyen` varchar(100) NOT NULL,
   `id_ga_di` int(11) NOT NULL,
   `id_ga_den` int(11) NOT NULL,
   `khoang_cach_km` int(11) DEFAULT NULL,
-  `gia_co_ban` decimal(10,2) NOT NULL COMMENT 'Giá gốc chưa nhân hệ số',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ma_tuyen` (`ma_tuyen`),
-  UNIQUE KEY `unique_route` (`id_ga_di`,`id_ga_den`),
-  KEY `id_ga_den` (`id_ga_den`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `gia_co_ban` decimal(10,2) NOT NULL COMMENT 'Giá gốc chưa nhân hệ số'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `tuyen_duong`
@@ -481,9 +452,8 @@ INSERT INTO `tuyen_duong` (`id`, `ma_tuyen`, `ten_tuyen`, `id_ga_di`, `id_ga_den
 -- Cấu trúc bảng cho bảng `ve_tau`
 --
 
-DROP TABLE IF EXISTS `ve_tau`;
-CREATE TABLE IF NOT EXISTS `ve_tau` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `ve_tau` (
+  `id` int(11) NOT NULL,
   `ma_ve` varchar(20) NOT NULL,
   `id_khach_hang` int(11) NOT NULL,
   `id_lich_trinh` int(11) NOT NULL,
@@ -491,71 +461,234 @@ CREATE TABLE IF NOT EXISTS `ve_tau` (
   `id_nhan_vien` int(11) DEFAULT NULL,
   `ngay_dat` datetime DEFAULT current_timestamp(),
   `gia_ve` decimal(10,2) NOT NULL,
-  `trang_thai` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ma_ve` (`ma_ve`),
-  UNIQUE KEY `unique_booking` (`id_lich_trinh`,`id_ghe`),
-  KEY `id_khach_hang` (`id_khach_hang`),
-  KEY `id_ghe` (`id_ghe`),
-  KEY `id_nhan_vien` (`id_nhan_vien`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `trang_thai` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `ve_tau`
 --
 
 INSERT INTO `ve_tau` (`id`, `ma_ve`, `id_khach_hang`, `id_lich_trinh`, `id_ghe`, `id_nhan_vien`, `ngay_dat`, `gia_ve`, `trang_thai`) VALUES
-(1, 'VE-01-01', 1, 1, 1, 6, '2025-01-10 08:00:00', 1200000.00, 'Đã thanh toán'),
-(2, 'VE-01-02', 2, 1, 2, 6, '2025-01-10 08:05:00', 1200000.00, 'Đã thanh toán'),
-(3, 'VE-01-03', 3, 1, 5, 7, '2025-01-11 09:00:00', 1500000.00, 'Đã thanh toán'),
-(4, 'VE-01-04', 4, 1, 6, 7, '2025-01-11 09:10:00', 1500000.00, 'Đã thanh toán'),
-(5, 'VE-01-05', 5, 1, 9, 6, '2025-01-12 10:00:00', 1800000.00, 'Đã thanh toán'),
-(6, 'VE-01-06', 6, 1, 10, 6, '2025-01-12 10:15:00', 1800000.00, 'Đã thanh toán'),
-(7, 'VE-01-07', 7, 2, 13, 8, '2025-01-15 08:00:00', 1200000.00, 'Đã thanh toán'),
-(8, 'VE-01-08', 8, 2, 14, 8, '2025-01-15 08:30:00', 1200000.00, 'Đã thanh toán'),
-(9, 'VE-01-09', 9, 2, 17, 9, '2025-01-16 09:00:00', 1500000.00, 'Đã thanh toán'),
-(10, 'VE-01-10', 10, 2, 21, 9, '2025-01-16 09:30:00', 1800000.00, 'Đã thanh toán'),
-(11, 'VE-01-11', 11, 3, 1, 6, '2025-01-20 10:00:00', 600000.00, 'Đã thanh toán'),
-(12, 'VE-01-12', 12, 3, 2, 6, '2025-01-20 10:05:00', 600000.00, 'Đã thanh toán'),
-(13, 'VE-03-01', 13, 4, 25, 7, '2025-03-01 08:00:00', 200000.00, 'Đã thanh toán'),
-(14, 'VE-03-02', 14, 4, 26, 7, '2025-03-01 08:00:00', 200000.00, 'Đã thanh toán'),
-(15, 'VE-03-03', 15, 4, 27, 7, '2025-03-02 09:00:00', 200000.00, 'Đã hủy'),
-(16, 'VE-04-01', 1, 5, 33, 6, '2025-04-10 10:00:00', 360000.00, 'Đã thanh toán'),
-(17, 'VE-04-02', 2, 5, 34, 6, '2025-04-10 10:00:00', 360000.00, 'Đã thanh toán'),
-(18, 'VE-04-03', 3, 5, 37, 8, '2025-04-12 14:00:00', 450000.00, 'Đã thanh toán'),
-(19, 'VE-04-04', 4, 5, 38, 8, '2025-04-12 14:00:00', 450000.00, 'Đã thanh toán'),
-(20, 'VE-04-05', 5, 6, 41, 9, '2025-04-20 08:00:00', 200000.00, 'Đã thanh toán'),
-(21, 'VE-04-06', 6, 6, 42, 9, '2025-04-20 08:00:00', 200000.00, 'Đã thanh toán'),
-(22, 'VE-04-07', 7, 6, 45, 9, '2025-04-21 09:00:00', 240000.00, 'Đã thanh toán'),
-(23, 'VE-05-01', 8, 7, 1, 6, '2025-04-25 10:00:00', 1200000.00, 'Đã thanh toán'),
-(24, 'VE-05-02', 9, 7, 5, 6, '2025-04-25 10:00:00', 1500000.00, 'Đã thanh toán'),
-(25, 'VE-06-01', 10, 8, 13, 7, '2025-06-01 08:00:00', 540000.00, 'Đã thanh toán'),
-(26, 'VE-06-02', 11, 8, 14, 7, '2025-06-01 08:00:00', 540000.00, 'Đã thanh toán'),
-(27, 'VE-06-03', 12, 8, 17, 7, '2025-06-02 09:00:00', 675000.00, 'Đã thanh toán'),
-(28, 'VE-06-04', 13, 8, 21, 7, '2025-06-02 09:00:00', 810000.00, 'Đã thanh toán'),
-(29, 'VE-06-05', 14, 9, 13, 8, '2025-06-10 10:00:00', 540000.00, 'Đã thanh toán'),
-(30, 'VE-06-06', 15, 9, 14, 8, '2025-06-10 10:00:00', 540000.00, 'Đã thanh toán'),
-(31, 'VE-12-01', 1, 10, 1, 6, '2025-12-01 08:00:00', 1200000.00, 'Đã thanh toán'),
-(32, 'VE-06-10', 16, 9, 15, 8, '2025-06-12 08:00:00', 540000.00, 'Đã thanh toán'),
-(33, 'VE-06-11', 16, 9, 16, 8, '2025-06-12 08:00:00', 540000.00, 'Đã thanh toán'),
-(34, 'VE-06-12', 17, 9, 18, 8, '2025-06-13 09:30:00', 675000.00, 'Đã thanh toán'),
-(35, 'VE-06-13', 18, 9, 19, 8, '2025-06-13 10:00:00', 675000.00, 'Đã thanh toán'),
-(36, 'VE-06-14', 19, 9, 20, 8, '2025-06-14 14:00:00', 675000.00, 'Đã thanh toán'),
-(37, 'VE-06-20', 1, 11, 33, 9, '2025-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
-(38, 'VE-06-21', 1, 11, 34, 9, '2025-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
-(39, 'VE-06-22', 1, 11, 35, 9, '2025-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
-(40, 'VE-06-23', 1, 11, 36, 9, '2025-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
-(41, 'VE-07-01', 2, 12, 41, 6, '2025-06-28 10:00:00', 400000.00, 'Đã thanh toán'),
-(42, 'VE-07-02', 3, 12, 42, 6, '2025-06-28 11:00:00', 400000.00, 'Đã thanh toán'),
-(43, 'VE-07-03', 4, 12, 43, 7, '2025-06-29 09:00:00', 400000.00, 'Đã thanh toán'),
-(44, 'VE-07-04', 5, 12, 44, 7, '2025-06-29 09:30:00', 400000.00, 'Đã thanh toán'),
-(45, 'VE-07-05', 6, 12, 45, 8, '2025-06-30 08:00:00', 480000.00, 'Đã thanh toán'),
-(46, 'VE-07-06', 7, 12, 46, 8, '2025-06-30 08:30:00', 480000.00, 'Đã thanh toán'),
-(47, 'VE-07-07', 20, 12, 47, 9, '2025-06-30 15:00:00', 480000.00, 'Đã thanh toán'),
-(48, 'VE-07-08', 19, 12, 48, 9, '2025-06-30 16:00:00', 480000.00, 'Đã thanh toán'),
-(49, 'VE-07-20', 10, 13, 13, 7, '2025-07-01 08:00:00', 500000.00, 'Đã hủy'),
-(50, 'VE-07-21', 11, 13, 14, 7, '2025-07-01 08:30:00', 500000.00, 'Đã hủy'),
-(51, 'VE-07-22', 12, 13, 15, 7, '2025-07-02 09:00:00', 500000.00, 'Đã thanh toán');
+(1, 'VE-01-01', 1, 1, 1, 6, '2026-01-10 08:00:00', 1200000.00, 'Đã thanh toán'),
+(2, 'VE-01-02', 2, 1, 2, 6, '2026-01-10 08:05:00', 1200000.00, 'Đã thanh toán'),
+(3, 'VE-01-03', 3, 1, 5, 7, '2026-01-11 09:00:00', 1500000.00, 'Đã thanh toán'),
+(4, 'VE-01-04', 4, 1, 6, 7, '2026-01-11 09:10:00', 1500000.00, 'Đã thanh toán'),
+(5, 'VE-01-05', 5, 1, 9, 6, '2026-01-12 10:00:00', 1800000.00, 'Đã thanh toán'),
+(6, 'VE-01-06', 6, 1, 10, 6, '2026-01-12 10:15:00', 1800000.00, 'Đã thanh toán'),
+(7, 'VE-01-07', 7, 2, 13, 8, '2026-01-15 08:00:00', 1200000.00, 'Đã thanh toán'),
+(8, 'VE-01-08', 8, 2, 14, 8, '2026-01-15 08:30:00', 1200000.00, 'Đã thanh toán'),
+(9, 'VE-01-09', 9, 2, 17, 9, '2026-01-16 09:00:00', 1500000.00, 'Đã thanh toán'),
+(10, 'VE-01-10', 10, 2, 21, 9, '2026-01-16 09:30:00', 1800000.00, 'Đã thanh toán'),
+(11, 'VE-01-11', 11, 3, 1, 6, '2026-01-20 10:00:00', 600000.00, 'Đã thanh toán'),
+(12, 'VE-01-12', 12, 3, 2, 6, '2026-01-20 10:05:00', 600000.00, 'Đã thanh toán'),
+(13, 'VE-03-01', 13, 4, 25, 7, '2026-03-01 08:00:00', 200000.00, 'Đã thanh toán'),
+(14, 'VE-03-02', 14, 4, 26, 7, '2026-03-01 08:00:00', 200000.00, 'Đã thanh toán'),
+(15, 'VE-03-03', 15, 4, 27, 7, '2026-03-02 09:00:00', 200000.00, 'Đã hủy'),
+(16, 'VE-04-01', 1, 5, 33, 6, '2026-04-10 10:00:00', 360000.00, 'Đã thanh toán'),
+(17, 'VE-04-02', 2, 5, 34, 6, '2026-04-10 10:00:00', 360000.00, 'Đã thanh toán'),
+(18, 'VE-04-03', 3, 5, 37, 8, '2026-04-12 14:00:00', 450000.00, 'Đã thanh toán'),
+(19, 'VE-04-04', 4, 5, 38, 8, '2026-04-12 14:00:00', 450000.00, 'Đã thanh toán'),
+(20, 'VE-04-05', 5, 6, 41, 9, '2026-04-20 08:00:00', 200000.00, 'Đã thanh toán'),
+(21, 'VE-04-06', 6, 6, 42, 9, '2026-04-20 08:00:00', 200000.00, 'Đã thanh toán'),
+(22, 'VE-04-07', 7, 6, 45, 9, '2026-04-21 09:00:00', 240000.00, 'Đã thanh toán'),
+(23, 'VE-05-01', 8, 7, 1, 6, '2026-04-25 10:00:00', 1200000.00, 'Đã thanh toán'),
+(24, 'VE-05-02', 9, 7, 5, 6, '2026-04-25 10:00:00', 1500000.00, 'Đã thanh toán'),
+(25, 'VE-06-01', 10, 8, 13, 7, '2026-06-01 08:00:00', 540000.00, 'Đã thanh toán'),
+(26, 'VE-06-02', 11, 8, 14, 7, '2026-06-01 08:00:00', 540000.00, 'Đã thanh toán'),
+(27, 'VE-06-03', 12, 8, 17, 7, '2026-06-02 09:00:00', 675000.00, 'Đã thanh toán'),
+(28, 'VE-06-04', 13, 8, 21, 7, '2026-06-02 09:00:00', 810000.00, 'Đã thanh toán'),
+(29, 'VE-06-05', 14, 9, 13, 8, '2026-06-10 10:00:00', 540000.00, 'Đã thanh toán'),
+(30, 'VE-06-06', 15, 9, 14, 8, '2026-06-10 10:00:00', 540000.00, 'Đã thanh toán'),
+(32, 'VE-06-10', 16, 9, 15, 8, '2026-06-12 08:00:00', 540000.00, 'Đã thanh toán'),
+(33, 'VE-06-11', 16, 9, 16, 8, '2026-06-12 08:00:00', 540000.00, 'Đã thanh toán'),
+(34, 'VE-06-12', 17, 9, 18, 8, '2026-06-13 09:30:00', 675000.00, 'Đã thanh toán'),
+(35, 'VE-06-13', 18, 9, 19, 8, '2026-06-13 10:00:00', 675000.00, 'Đã thanh toán'),
+(36, 'VE-06-14', 19, 9, 20, 8, '2026-06-14 14:00:00', 675000.00, 'Đã thanh toán'),
+(37, 'VE-06-20', 1, 11, 33, 9, '2026-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
+(38, 'VE-06-21', 1, 11, 34, 9, '2026-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
+(39, 'VE-06-22', 1, 11, 35, 9, '2026-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
+(40, 'VE-06-23', 1, 11, 36, 9, '2026-06-20 08:00:00', 1500000.00, 'Đã thanh toán'),
+(41, 'VE-07-01', 2, 12, 41, 6, '2026-06-28 10:00:00', 400000.00, 'Đã thanh toán'),
+(42, 'VE-07-02', 3, 12, 42, 6, '2026-06-28 11:00:00', 400000.00, 'Đã thanh toán'),
+(43, 'VE-07-03', 4, 12, 43, 7, '2026-06-29 09:00:00', 400000.00, 'Đã thanh toán'),
+(44, 'VE-07-04', 5, 12, 44, 7, '2026-06-29 09:30:00', 400000.00, 'Đã thanh toán'),
+(45, 'VE-07-05', 6, 12, 45, 8, '2026-06-30 08:00:00', 480000.00, 'Đã thanh toán'),
+(46, 'VE-07-06', 7, 12, 46, 8, '2026-06-30 08:30:00', 480000.00, 'Đã thanh toán'),
+(47, 'VE-07-07', 20, 12, 47, 9, '2026-06-30 15:00:00', 480000.00, 'Đã thanh toán'),
+(48, 'VE-07-08', 19, 12, 48, 9, '2026-06-30 16:00:00', 480000.00, 'Đã thanh toán'),
+(49, 'VE-07-20', 10, 13, 13, 7, '2026-07-01 08:00:00', 500000.00, 'Đã hủy'),
+(50, 'VE-07-21', 11, 13, 14, 7, '2026-07-01 08:30:00', 500000.00, 'Đã hủy'),
+(51, 'VE-07-22', 12, 13, 15, 7, '2026-07-02 09:00:00', 500000.00, 'Đã thanh toán'),
+(52, 'KH-260912180740-857', 21, 10, 2, NULL, '2026-09-12 23:07:40', 1200000.00, 'Chờ xác nhận'),
+(53, 'KH-260912180756-639', 21, 10, 3, NULL, '2026-09-12 23:07:56', 1200000.00, 'Đã thanh toán'),
+(54, 'KH-260912181220-395', 21, 10, 4, NULL, '2026-09-12 23:12:20', 1200000.00, 'Chờ xác nhận');
+
+--
+-- Chỉ mục cho các bảng đã đổ
+--
+
+--
+-- Chỉ mục cho bảng `ga_tau`
+--
+ALTER TABLE `ga_tau`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ma_ga` (`ma_ga`),
+  ADD UNIQUE KEY `ten_ga` (`ten_ga`);
+
+--
+-- Chỉ mục cho bảng `ghe`
+--
+ALTER TABLE `ghe`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_ghe_trong_toa` (`so_ghe`,`id_toa_tau`),
+  ADD KEY `id_toa_tau` (`id_toa_tau`);
+
+--
+-- Chỉ mục cho bảng `khach_hang`
+--
+ALTER TABLE `khach_hang`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `sdt` (`sdt`),
+  ADD UNIQUE KEY `cccd` (`cccd`);
+
+--
+-- Chỉ mục cho bảng `lich_trinh`
+--
+ALTER TABLE `lich_trinh`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_tau_schedule` (`id_tau`,`ngay_di`),
+  ADD UNIQUE KEY `ma_lich_trinh` (`ma_lich_trinh`),
+  ADD KEY `id_tuyen_duong` (`id_tuyen_duong`);
+
+--
+-- Chỉ mục cho bảng `loai_toa`
+--
+ALTER TABLE `loai_toa`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ten_loai` (`ten_loai`);
+
+--
+-- Chỉ mục cho bảng `nhan_vien`
+--
+ALTER TABLE `nhan_vien`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ma_nhan_vien` (`ma_nhan_vien`),
+  ADD UNIQUE KEY `sdt` (`sdt`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Chỉ mục cho bảng `tai_khoan_khach_hang`
+--
+ALTER TABLE `tai_khoan_khach_hang`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `id_khach_hang` (`id_khach_hang`);
+
+--
+-- Chỉ mục cho bảng `tau`
+--
+ALTER TABLE `tau`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ma_tau` (`ma_tau`);
+
+--
+-- Chỉ mục cho bảng `toa_tau`
+--
+ALTER TABLE `toa_tau`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_toa_trong_tau` (`ma_toa`,`id_tau`),
+  ADD KEY `id_tau` (`id_tau`),
+  ADD KEY `id_loai_toa` (`id_loai_toa`);
+
+--
+-- Chỉ mục cho bảng `tuyen_duong`
+--
+ALTER TABLE `tuyen_duong`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ma_tuyen` (`ma_tuyen`),
+  ADD UNIQUE KEY `unique_route` (`id_ga_di`,`id_ga_den`),
+  ADD KEY `id_ga_den` (`id_ga_den`);
+
+--
+-- Chỉ mục cho bảng `ve_tau`
+--
+ALTER TABLE `ve_tau`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `ma_ve` (`ma_ve`),
+  ADD UNIQUE KEY `unique_booking` (`id_lich_trinh`,`id_ghe`),
+  ADD KEY `id_khach_hang` (`id_khach_hang`),
+  ADD KEY `id_ghe` (`id_ghe`),
+  ADD KEY `id_nhan_vien` (`id_nhan_vien`);
+
+--
+-- AUTO_INCREMENT cho các bảng đã đổ
+--
+
+--
+-- AUTO_INCREMENT cho bảng `ga_tau`
+--
+ALTER TABLE `ga_tau`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT cho bảng `ghe`
+--
+ALTER TABLE `ghe`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+
+--
+-- AUTO_INCREMENT cho bảng `khach_hang`
+--
+ALTER TABLE `khach_hang`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT cho bảng `lich_trinh`
+--
+ALTER TABLE `lich_trinh`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT cho bảng `loai_toa`
+--
+ALTER TABLE `loai_toa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT cho bảng `nhan_vien`
+--
+ALTER TABLE `nhan_vien`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT cho bảng `tai_khoan_khach_hang`
+--
+ALTER TABLE `tai_khoan_khach_hang`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT cho bảng `tau`
+--
+ALTER TABLE `tau`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT cho bảng `toa_tau`
+--
+ALTER TABLE `toa_tau`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT cho bảng `tuyen_duong`
+--
+ALTER TABLE `tuyen_duong`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT cho bảng `ve_tau`
+--
+ALTER TABLE `ve_tau`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -573,6 +706,12 @@ ALTER TABLE `ghe`
 ALTER TABLE `lich_trinh`
   ADD CONSTRAINT `lich_trinh_ibfk_1` FOREIGN KEY (`id_tau`) REFERENCES `tau` (`id`),
   ADD CONSTRAINT `lich_trinh_ibfk_2` FOREIGN KEY (`id_tuyen_duong`) REFERENCES `tuyen_duong` (`id`);
+
+--
+-- Các ràng buộc cho bảng `tai_khoan_khach_hang`
+--
+ALTER TABLE `tai_khoan_khach_hang`
+  ADD CONSTRAINT `tai_khoan_khach_hang_fk` FOREIGN KEY (`id_khach_hang`) REFERENCES `khach_hang` (`id`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `toa_tau`
@@ -596,7 +735,6 @@ ALTER TABLE `ve_tau`
   ADD CONSTRAINT `ve_tau_ibfk_2` FOREIGN KEY (`id_lich_trinh`) REFERENCES `lich_trinh` (`id`),
   ADD CONSTRAINT `ve_tau_ibfk_3` FOREIGN KEY (`id_ghe`) REFERENCES `ghe` (`id`),
   ADD CONSTRAINT `ve_tau_ibfk_4` FOREIGN KEY (`id_nhan_vien`) REFERENCES `nhan_vien` (`id`);
-SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

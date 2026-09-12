@@ -9,9 +9,9 @@
         </div>
 
         <div class="copyright">
-            © <?php echo date('Y'); ?> - NPMTT - Lớp 74DCTT28 <br>
-            <a href="https://maps.app.goo.gl/DsJh314gN3WfjF7c6" target="_blank">
-                Trường Đại học Công nghệ Giao thông Vận tải
+            © <?php echo date('Y'); ?> - Khổng Quốc Trung- Lớp 74DCTT11<br>
+            <a href="https://www.google.com/maps/search/?api=1&query=Tr%C6%B0%E1%BB%9Dng%20%C4%90%E1%BA%A1i%20h%E1%BB%8Dc%20C%C3%B4ng%20ngh%E1%BB%87%20Giao%20th%C3%B4ng%20V%E1%BA%ADn%20t%E1%BA%A3i%20c%C6%A1%20s%E1%BB%9F%20V%C4%A9nh%20Ph%C3%BAc" target="_blank" rel="noopener noreferrer">
+                Trường Đại học Công nghệ Giao thông Vận tải - Cơ sở Vĩnh Phúc
             </a>
         </div>
     </div>
