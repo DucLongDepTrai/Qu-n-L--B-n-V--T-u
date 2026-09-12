@@ -331,7 +331,7 @@ CREATE TABLE `nhan_vien` (
 --
 
 INSERT INTO `nhan_vien` (`id`, `ma_nhan_vien`, `mat_khau`, `ho_ten`, `ngay_sinh`, `gioi_tinh`, `sdt`, `email`, `dia_chi`, `vai_tro`) VALUES
-(1, 'ADMIN01', '$2a$12$gmkjs/CePmv8B6L684vWD.ytns6H4aoo4EXuFcVMAfWD1iV586QzW', 'Trung', '1980-05-15', 'Nam', '0909123456', 'Trung@tauhoa.vn', 'Số 10, Đội Cấn, Ba Đình, Hà Nội', 'Quản trị viên'),
+(1, 'ADMIN01', '$2a$12$gmkjs/CePmv8B6L684vWD.ytns6H4aoo4EXuFcVMAfWD1iV586QzW', 'Trung', '1980-05-15', 'Nam', '0909123456', 'Trung@tauhoa.vn', 'Vĩnh Yên, Vĩnh Phúc', 'Quản trị viên'),
 (6, 'NV01', '$2a$12$WS1mox8/ujPzoAsNGQ8S5OfsBt1FqG6TrqMQABvnx2vIiYEbcoto6', 'Vũ Thị Thu Ngân', '1998-04-26', 'Nữ', '0909678901', 'ngan.vu@tauhoa.vn', 'Thanh Khê, Đà Nẵng', 'Nhân viên'),
 (7, 'NV02', '$2a$12$RQ1t6qizqBDzPokkJxpfLucu2i6M0SEjcP5UNiNlonXRWG1geAaNy', 'Ngô Xuân Bách', '1993-09-15', 'Nam', '0909789012', 'bach.ngo@tauhoa.vn', 'Gò Vấp, TP.HCM', 'Nhân viên'),
 (8, 'NV03', '$2a$12$u1h7j1s6ATb8Du0STcvZk.8VuA7KSMqeQzUWbnR2NdR34Jz.kKqhO', 'Đặng Tuyết Mai', '2000-01-20', 'Nữ', '0909890123', 'mai.dang@tauhoa.vn', 'Long Biên, Hà Nội', 'Nhân viên'),
